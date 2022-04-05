@@ -1,0 +1,18 @@
+<div class="toolbar" role="banner">
+  <span>File Management</span>
+</div>
+
+<div class="content" role="main">
+  <div class="card highlight-card card-small">
+    <input type="file" (change)="onFileSelected($event)"/>
+
+    <button type="button" (click)="onUploadImage()">Upload</button>
+  </div>
+
+  <div class="card-container">
+    <div class="card" *ngFor="let image of images">
+      <img [src]="image.url" />
+    </div>
+  </div>
+
+</div>
