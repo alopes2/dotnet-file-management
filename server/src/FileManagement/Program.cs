@@ -33,25 +33,51 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options => {
+    app.UseSwaggerUI(options =>
+    {
         options.RoutePrefix = "";
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "File Management");
     });
 }
 
-app.MapGet("/images", async (
-    IImageService imageService,
-    IMapper mapper) =>
+app.MapGet("/images", async(
+        IImageService imageService,
+        IMapper mapper) =>
+    {
+        var images = await imageService.GetImagesAsync();
+
+        var imageResources = mapper.Map<IEnumerable<ImageResource>>(images);
+
+        return Results.Ok(imageResources);
+    })
+    .WithName("GetImages");
+
+app.MapPost("/images", async(
+        HttpRequest request,
+        IImageService imageService,
+        IMapper mapper) =>
+    {
+        var form = await request.ReadFormAsync();
+
+        var imageFile = form.Files.GetFile("Image");
+
+        if (imageFile is null || imageFile.Length == 0)
+        {
+            return Results.BadRequest("Image is not provided");
+        }
+
+        var uploadImage = mapper.Map<UploadImage>(imageFile);
+
+        var image = await imageService.UploadImageAsync(uploadImage);
+
+        var imageResource = mapper.Map<ImageResource>(image);
+
+        return Results.Created(imageResource.Url, imageResource);
+    })
+    .WithName("AddImages");
+
+app.UseCors(config =>
 {
-    var images = await imageService.GetImagesAsync();
-
-    var imageResources = mapper.Map<IEnumerable<ImageResource>>(images);
-
-    return Results.Ok(imageResources);
-})
-.WithName("GetImages");
-
-app.UseCors(config => {
     config.AllowAnyOrigin();
 });
 

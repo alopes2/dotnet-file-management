@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FileManagement.API.Controllers;
 
 [ApiController]
-[Route("images")]
+[Route("controller-images")]
 public class ImagesController : ControllerBase
 {
     private readonly IMapper _mapper;

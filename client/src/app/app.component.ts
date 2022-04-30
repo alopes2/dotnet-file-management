@@ -13,6 +13,7 @@ export class AppComponent {
   images: Image[] = [];
   newImage: any;
 
+  // Change here for your API base address
   private baseAddress = 'https://localhost:7227';
 
   constructor(private http: HttpClient) {}
