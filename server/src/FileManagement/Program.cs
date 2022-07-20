@@ -5,9 +5,7 @@ using FileManagement.Core.Models;
 using FileManagement.Core.Services;
 using FileManagement.Data.Configurations;
 using FileManagement.Data.Extensions;
-using FileManagement.Firebase.Configurations;
 using FileManagement.Firebase.Extensions;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +48,7 @@ app.MapGet("/images", async(
 
         return Results.Ok(imageResources);
     })
+    .Produces(200)
     .WithName("GetImages");
 
 app.MapPost("/images", async(
@@ -59,7 +58,7 @@ app.MapPost("/images", async(
     {
         var form = await request.ReadFormAsync();
 
-        var imageFile = form.Files.GetFile("Image");
+        var imageFile = form.Files.GetFile(nameof(UploadImageResource.Image));
 
         if (imageFile is null || imageFile.Length == 0)
         {
@@ -74,7 +73,12 @@ app.MapPost("/images", async(
 
         return Results.Created(imageResource.Url, imageResource);
     })
+    .Accepts<UploadImageResource>("multipart/form-data")
+    .Produces(201)
+    .Produces(400)
     .WithName("AddImages");
+
+
 
 app.UseCors(config =>
 {
